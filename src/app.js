@@ -63,3 +63,59 @@ const galleryItems = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+const galleryRef = document.querySelector('.js-gallery');
+const lightboxRef = document.querySelector('.js-lightbox');
+const overlayGalleryRef = document.querySelector('.lightbox__overlay');
+const closeButton = document.querySelector('[data-action="close-lightbox"]')
+const imageRef = document.querySelector('.lightbox__image');
+function createGallery(gallery) {
+  return gallery
+    .map(({ preview, original, description }) => {
+      return `
+      <li class="gallery__item">
+        <a
+          class="gallery__link"
+          href="${original}"
+        >
+          <img
+            loading="lazy"
+            class="gallery__image"
+            src="${preview}"
+            data-source="${original}"
+            alt="${description}"
+          />
+        </a>
+      </li>
+    `;
+    })  
+}
+const makeGallery = createGallery(galleryItems).join("");
+galleryRef.insertAdjacentHTML("beforeend", makeGallery);
+const openModal = event => {
+  event.preventDefault();
+  if (event.target === event.currentTarget) return;
+  lightboxRef.classList.add('is-open');
+  imageRef.src = event.target.getAttribute('data-source');
+  imageRef.alt = event.target.alt;
+  window.addEventListener('keydown', onPressESC);
+};
+const closeModal = () => {
+  lightboxRef.classList.remove('is-open');
+  imageRef.src = '';
+  imageRef.alt = '';
+  window.removeEventListener('keydown', onPressESC);
+};
+galleryRef.addEventListener("click",openModal)
+closeButton.addEventListener("click", closeModal)
+const onOverlayClick = event => {
+  if (event.target === event.currentTarget) {
+    closeModal();
+  }
+};
+const onPressESC = event => {
+  if (event.code === 'Escape') {
+    closeModal();
+  }
+};
+overlayGalleryRef.addEventListener("click", onOverlayClick)
+
